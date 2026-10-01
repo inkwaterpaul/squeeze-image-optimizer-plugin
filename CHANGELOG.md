@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.3] - 2026-10-01
+
+### Added
+- Converting an image's format now updates its URLs in post content automatically — full size and every thumbnail size — across posts, pages, synced patterns and block-theme templates. Previously, Image and Cover blocks (which store the URL in the content, not just the attachment ID) were left pointing at the deleted original and had to be reselected. Restoring an original reverses the update.
+- The Conversions Log shows how many posts each conversion updated, and its WP-CLI commands now cover every resized copy, not just the main file.
+
+### Changed
+- Old resized copies (e.g. `photo-300x200.jpg` after converting to WebP, or a size an image no longer qualifies for after being shrunk) are now deleted once post content has been moved to the new files, instead of being left on disk.
+
 ## [1.2.2] - 2026-10-01
 
 ### Added

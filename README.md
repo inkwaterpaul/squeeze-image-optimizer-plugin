@@ -12,7 +12,8 @@ A WordPress plugin that resizes, recompresses and optionally converts images alr
 - **Automatic optimisation of new uploads**, applied before thumbnails are generated so core never does the resize twice
 - **A bulk tool** for your existing library, processed in small batches so it survives hosting execution-time limits on libraries of thousands of images — with a live progress bar, ETA, and a per-image error log
 - **Backups with expiry** — the original is kept the first time an image is touched, with one-click restore from the Media Library, an automatic expiry window (7/14/30/90 days, or forever), and a manual "delete all backups now" option
-- **A conversions log** — every format change gets a ready-to-copy `wp search-replace` command for catching any hardcoded URLs left in page content
+- **Post content kept in step with conversions** — when an image changes format, its URLs (full size and every thumbnail size) are updated in post, page, pattern and template content automatically, so Image and Cover blocks don't break
+- **A conversions log** — every format change is listed with how many posts were updated, plus a ready-to-copy `wp search-replace` command for URLs stored outside post content
 
 ## Requirements
 
@@ -32,7 +33,7 @@ The plugin leans entirely on `wp_get_image_editor()` — the same abstraction Wo
 
 - **New uploads** are intercepted via the `wp_handle_upload`/`wp_handle_sideload` filters, before any attachment post or thumbnail sizes exist, so the smaller/converted file is what every registered size gets generated from.
 - **Existing attachments** go through the bulk tool, which backs up the original once, resizes/recompresses/converts, regenerates thumbnail sizes, and records size-saving stats against the attachment.
-- **Format conversion** updates the attachment's own metadata (mime type, attached file) so anything referencing the image by attachment ID — the block editor, most page builders — picks up the new URL automatically. Anything with the URL hand-typed into older content won't update on its own; the Conversions Log tab gives you the exact WP-CLI command to find and fix those safely, rather than the plugin attempting a blind database rewrite itself.
+- **Format conversion changes file URLs.** Core blocks such as Image and Cover save the image URL into the post content itself rather than looking it up by attachment ID, so after converting, the plugin rewrites those URLs in `post_content` (posts, pages, synced patterns, block-theme templates; not revisions). Old resized copies are then deleted, and restoring an original reverses the update. URLs stored anywhere else — page-builder data in post meta (e.g. Elementor), widgets, theme options — are **not** updated, because that data is often PHP-serialized and a plain replace would corrupt it, so they'll break until you run the WP-CLI commands from the Conversions Log tab. Clear any page cache after a conversion run.
 
 ## Important notes
 

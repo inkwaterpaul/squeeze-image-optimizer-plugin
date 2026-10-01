@@ -260,7 +260,8 @@ class SIO_Optimizer {
 
 		$source_mime = get_post_mime_type( $attachment_id );
 		$args        = SIO_Settings::get_all();
-		$old_url     = wp_get_attachment_url( $attachment_id );
+		$old_urls    = SIO_Content_Urls::url_map( $attachment_id );
+		$old_sizes   = self::size_files( $attachment_id );
 
 		SIO_Backup::backup_once( $attachment_id, $file );
 
@@ -284,10 +285,26 @@ class SIO_Optimizer {
 			$metadata = wp_generate_attachment_metadata( $attachment_id, get_attached_file( $attachment_id ) );
 			wp_update_attachment_metadata( $attachment_id, $metadata );
 
-			if ( ! empty( $result['ext_changed'] ) ) {
-				$new_url = wp_get_attachment_url( $attachment_id );
-				SIO_Conversions_Log::add( $attachment_id, $old_url, $new_url );
+			// Runs on every optimisation, not just conversions: shrinking an
+			// image can drop a size (e.g. 1536x1024 on a now-1200px-wide image)
+			// whose file is about to be deleted below, so content using it
+			// must move to a URL that still exists first.
+			$new_urls     = SIO_Content_Urls::url_map( $attachment_id );
+			$replacements = SIO_Content_Urls::replacements( $old_urls, $new_urls );
+			$updated      = SIO_Content_Urls::rewrite( $replacements );
+
+			// Old resized copies the new metadata no longer lists (all of
+			// them, after a format change) are orphans — remove them.
+			foreach ( array_diff( $old_sizes, self::size_files( $attachment_id ) ) as $orphan ) {
+				if ( file_exists( $orphan ) ) {
+					@unlink( $orphan );
+				}
 			}
+
+			if ( ! empty( $result['ext_changed'] ) ) {
+				SIO_Conversions_Log::add( $attachment_id, $replacements, $updated );
+			}
+			$result['posts_updated'] = $updated;
 		}
 
 		$stats = array(
@@ -299,6 +316,25 @@ class SIO_Optimizer {
 		update_post_meta( $attachment_id, '_sio_optimized', $stats );
 
 		return array_merge( array( 'id' => $attachment_id, 'title' => $title ), $result );
+	}
+
+	/**
+	 * Absolute paths of an attachment's generated sizes (not the main file,
+	 * and not the pre-"-scaled" original upload, which is left untouched).
+	 */
+	private static function size_files( $attachment_id ) {
+		$meta  = wp_get_attachment_metadata( $attachment_id );
+		$file  = get_attached_file( $attachment_id );
+		$paths = array();
+		if ( $file && ! empty( $meta['sizes'] ) && is_array( $meta['sizes'] ) ) {
+			$dir = trailingslashit( dirname( $file ) );
+			foreach ( $meta['sizes'] as $size ) {
+				if ( ! empty( $size['file'] ) ) {
+					$paths[] = $dir . $size['file'];
+				}
+			}
+		}
+		return array_unique( $paths );
 	}
 
 	/**

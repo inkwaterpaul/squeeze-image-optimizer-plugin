@@ -4,7 +4,7 @@ Tags: images, optimization, media library, compression, webp
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,11 +25,12 @@ Features:
 * A bulk tool to run over your whole existing library, in small batches so it won't time out on a large site
 * Keeps one backup of each image's original file the first time it's optimised, with a one-click restore from the Media Library
 * Backups expire automatically (7/14/30/90 days, or never) so they don't just sit there duplicating your library forever — plus a "delete all backups now" button and a live count of how many backups exist and how much space they're using
-* A log of every format conversion, each with a ready-to-copy `wp search-replace` command for catching any hardcoded URLs left in page content
+* When an image changes format, its URLs are updated in post, page, pattern and template content automatically, so Image and Cover blocks don't break
+* A log of every format conversion, with how many posts were updated and a ready-to-copy `wp search-replace` command for URLs stored outside post content
 
 == Important notes ==
 
-**Format conversion changes file extensions and URLs.** The attachment's own metadata is kept consistent automatically, so anything that references an image by its attachment ID (the block editor, most page builders) picks up the new URL on its own. Anything with the old URL hand-typed into content will not update on its own — check the Conversions Log tab after a bulk conversion run.
+**Format conversion changes file extensions and URLs.** Core blocks like Image and Cover store the image URL in the post content itself, so the plugin updates those URLs in post, page, pattern and template content when it converts an image (and reverses it if you restore the original). The old resized copies are deleted, so URLs stored anywhere else — page-builder data such as Elementor's, widgets, theme options — will break until fixed; they are not changed automatically. Check the Conversions Log tab after a bulk conversion run for the WP-CLI command that fixes those. Clear any page cache afterwards.
 
 **Auto-optimise-on-upload does not keep a backup.** There's no attachment yet to attach one to when a file first lands in the uploads folder. If you want a backup, use the Bulk Optimise tool instead (it always backs up before touching anything), or just re-upload if a result looks wrong.
 
@@ -48,6 +49,11 @@ Features:
 3. Go to Media → Image Optimizer to configure settings and run the bulk tool
 
 == Changelog ==
+
+= 1.2.3 =
+* Converting an image's format now updates its URLs in post content automatically (full size and every thumbnail size), so Image and Cover blocks no longer break and need the image reselecting. Restoring an original reverses the update.
+* The Conversions Log shows how many posts each conversion updated, and its WP-CLI commands now cover every resized copy, not just the main file.
+* Old resized copies left behind by a conversion (or by shrinking an image) are now deleted, instead of being left on disk.
 
 = 1.2.2 =
 * The plugin version is now shown next to the page title on Media → Image Optimizer, so it's easy to confirm which version is running.

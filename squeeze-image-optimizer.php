@@ -3,7 +3,7 @@
  * Plugin Name: Squeeze Image Optimizer
  * Plugin URI:  https://inkandwater.co.uk
  * Description: Resizes and recompresses Media Library images (optionally converting format) to cut file size, with safe backups, a bulk pass over your existing library, and automatic optimisation of new uploads.
- * Version:     1.2.2
+ * Version:     1.2.3
  * Author:      Ink & Water
  * Author URI:  https://inkandwater.co.uk
  * License:     GPL v2 or later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Must match the Version header above: it's the ?ver= cache-buster on
 // admin.js/admin.css, so a stale value keeps browsers on the old scripts.
-define( 'SIO_VERSION', '1.2.2' );
+define( 'SIO_VERSION', '1.2.3' );
 define( 'SIO_PLUGIN_FILE', __FILE__ );
 define( 'SIO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SIO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -30,6 +30,7 @@ define( 'SIO_CRON_HOOK', 'sio_daily_backup_cleanup' );
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-settings.php';
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-backup.php';
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-conversions-log.php';
+require_once SIO_PLUGIN_DIR . 'includes/class-sio-content-urls.php';
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-optimizer.php';
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-upload-hook.php';
 require_once SIO_PLUGIN_DIR . 'includes/class-sio-media-library.php';

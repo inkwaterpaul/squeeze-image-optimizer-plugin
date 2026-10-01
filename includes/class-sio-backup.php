@@ -92,6 +92,7 @@ class SIO_Backup {
 
 		$current_file = get_attached_file( $attachment_id );
 		$uploads      = wp_upload_dir();
+		$current_urls = SIO_Content_Urls::url_map( $attachment_id );
 
 		// Delete the currently-generated sizes before we change the base image.
 		$current_meta = wp_get_attachment_metadata( $attachment_id );
@@ -128,6 +129,12 @@ class SIO_Backup {
 
 		$new_metadata = wp_generate_attachment_metadata( $attachment_id, $original_abs );
 		wp_update_attachment_metadata( $attachment_id, $new_metadata );
+
+		// Undoing a format conversion deletes the converted file, so point
+		// post content back at the restored original's URLs.
+		SIO_Content_Urls::rewrite(
+			SIO_Content_Urls::replacements( $current_urls, SIO_Content_Urls::url_map( $attachment_id ) )
+		);
 
 		delete_post_meta( $attachment_id, '_sio_optimized' );
 		update_post_meta( $attachment_id, '_sio_restored', current_time( 'mysql' ) );
