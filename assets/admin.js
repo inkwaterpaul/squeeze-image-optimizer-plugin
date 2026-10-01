@@ -11,6 +11,14 @@
 		return $.post( SIO.ajaxUrl, Object.assign( { action: action, nonce: SIO.nonce }, data ) );
 	}
 
+	// wp_localize_script sends every value through as a string, so
+	// SIO.batchSize arrives as "5", not 5. Left as-is, `index + SIO.batchSize`
+	// silently does STRING concatenation (0+"5"="05", 5+"5"="55", 55+"5"="555"…)
+	// instead of addition, which is exactly what caused batches to balloon
+	// to thousands of images in one request — and the resulting timeout.
+	// Coerce once, here, so nothing downstream can repeat that mistake.
+	var BATCH_SIZE = parseInt( SIO.batchSize, 10 ) || 20;
+
 	function esc( str ) {
 		return $( '<div>' ).text( str == null ? '' : String( str ) ).html();
 	}
@@ -94,7 +102,7 @@
 			return;
 		}
 
-		var batch      = bulkState.ids.slice( bulkState.index, bulkState.index + SIO.batchSize );
+		var batch      = bulkState.ids.slice( bulkState.index, bulkState.index + BATCH_SIZE );
 		var batchStart = bulkState.index;
 		var inflightEnd = batchStart + batch.length;
 

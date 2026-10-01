@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.1] - 2026-10-01
+
+### Fixed
+- A bulk run's batch size could silently balloon to thousands of images in a single request — visible as the progress bar jumping in huge, uneven leaps (5 → 55 → 555 → done) and liable to hit a server timeout on a large library. Caused by `wp_localize_script` sending the batch size through as a string; batch-boundary arithmetic (`index + batchSize`) was doing string concatenation instead of addition. Now explicitly parsed to a number client-side.
+
+### Changed
+- Batch size increased from 5 to 20 images per request, now that it's reliably enforced — fewer round trips, faster bulk runs.
+
 ## [1.2.0] - 2026-10-01
 
 ### Added

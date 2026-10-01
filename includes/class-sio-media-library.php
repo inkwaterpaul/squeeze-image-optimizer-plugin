@@ -60,7 +60,10 @@ class SIO_Media_Library {
 			array(
 				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 				'nonce'     => wp_create_nonce( self::NONCE_ACTION ),
-				'batchSize' => 5,
+				// Sent as a string by wp_localize_script regardless of this
+				// PHP type — admin.js explicitly parses it back to a number,
+				// so don't rely on it arriving as one.
+				'batchSize' => 20,
 			)
 		);
 	}

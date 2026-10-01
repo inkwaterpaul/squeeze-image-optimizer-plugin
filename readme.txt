@@ -1,10 +1,10 @@
 === Squeeze Image Optimizer ===
-Contributors: inkandwater, inkwaterpaul
+Contributors: inkandwater
 Tags: images, optimization, media library, compression, webp
 Requires at least: 5.8
-Tested up to: 7.1.2
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,10 @@ Features:
 3. Go to Media → Image Optimizer to configure settings and run the bulk tool
 
 == Changelog ==
+
+= 1.2.1 =
+* Fixed a bug where a bulk run's batch size could silently balloon to thousands of images in a single request (visible as the progress bar jumping in huge, uneven leaps — e.g. 5 to 55 to 555 before suddenly "finishing" — and liable to hit a server timeout on a large library). Caused by `wp_localize_script` sending the batch size through as a string, which turned batch-boundary arithmetic into string concatenation rather than addition.
+* Batch size increased from 5 to 20 images per request, now that it's reliably enforced — fewer round trips, faster bulk runs.
 
 = 1.2.0 =
 * Bulk Optimise progress bar now shows a lighter "in progress" segment and a status line the moment each batch is sent, instead of only updating once it returns — a slow batch no longer looks like a frozen page

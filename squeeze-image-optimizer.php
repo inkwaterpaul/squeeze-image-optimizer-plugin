@@ -3,7 +3,7 @@
  * Plugin Name: Squeeze Image Optimizer
  * Plugin URI:  https://inkandwater.co.uk
  * Description: Resizes and recompresses Media Library images (optionally converting format) to cut file size, with safe backups, a bulk pass over your existing library, and automatic optimisation of new uploads.
- * Version:     1.2.0
+ * Version:     1.2.1
  * Author:      Ink & Water
  * Author URI:  https://inkandwater.co.uk
  * License:     GPL v2 or later
