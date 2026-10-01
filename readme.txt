@@ -4,7 +4,7 @@ Tags: images, optimization, media library, compression, webp
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,11 @@ Features:
 3. Go to Media → Image Optimizer to configure settings and run the bulk tool
 
 == Changelog ==
+
+= 1.2.2 =
+* The plugin version is now shown next to the page title on Media → Image Optimizer, so it's easy to confirm which version is running.
+* Fixed the 1.2.1 batch-size fix not reaching browsers: the script's cache-busting version was left at 1.2.0, so the old admin.js stayed cached and bulk runs still sent batches of around 2,000 images (status line read e.g. "Optimising images 21–2020 of 2686").
+* The server now rejects any bulk batch larger than 20 images, so a stale or faulty script can't send an oversized request again.
 
 = 1.2.1 =
 * Fixed a bug where a bulk run's batch size could silently balloon to thousands of images in a single request (visible as the progress bar jumping in huge, uneven leaps — e.g. 5 to 55 to 555 before suddenly "finishing" — and liable to hit a server timeout on a large library). Caused by `wp_localize_script` sending the batch size through as a string, which turned batch-boundary arithmetic into string concatenation rather than addition.

@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.2] - 2026-10-01
+
+### Added
+- The plugin version is now shown next to the page title on Media → Image Optimizer, so it's easy to confirm which version is running.
+
+### Fixed
+- The 1.2.1 batch-size fix never reached browsers: `SIO_VERSION` (the `?ver=` cache-buster on admin.js) was left at 1.2.0, so the old script stayed cached and bulk runs still sent batches of ~2,000 images (status line read e.g. "Optimising images 21–2020 of 2686"). The version constant now matches the plugin header.
+- The server now rejects any bulk batch larger than 20 images, so a stale or faulty script can't send an oversized request again.
+
 ## [1.2.1] - 2026-10-01
 
 ### Fixed

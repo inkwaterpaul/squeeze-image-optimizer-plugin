@@ -1,3 +1,11 @@
+.sio-wrap .sio-version {
+	font-size: 13px;
+	font-weight: 400;
+	color: #787c82;
+	vertical-align: middle;
+	margin-left: 4px;
+}
+
 .sio-wrap .nav-tab-wrapper {
 	margin-bottom: 1.5em;
 }

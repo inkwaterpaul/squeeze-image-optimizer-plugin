@@ -153,7 +153,9 @@
 				// beats a silent count going up with no explanation.
 				var label  = 'Batch of ' + batch.length + ' images failed (IDs: ' + batch.join( ', ' ) + ')';
 				var detail = 'HTTP ' + ( jqXHR.status || '?' ) + ' ' + ( textStatus || '' );
-				if ( jqXHR.status === 0 ) {
+				if ( jqXHR.responseJSON && typeof jqXHR.responseJSON.data === 'string' ) {
+					detail += ' — ' + jqXHR.responseJSON.data;
+				} else if ( jqXHR.status === 0 ) {
 					detail += ' — connection lost or request timed out.';
 				} else if ( jqXHR.status >= 500 ) {
 					detail += ' — likely a PHP timeout or memory limit on one of these images. Check your host’s PHP error log for this time.';

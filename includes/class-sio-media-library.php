@@ -12,6 +12,7 @@ class SIO_Media_Library {
 
 	private static $instance = null;
 	const NONCE_ACTION = 'sio_ajax';
+	const BATCH_SIZE   = 20;
 
 	public static function instance() {
 		if ( null === self::$instance ) {
@@ -63,7 +64,7 @@ class SIO_Media_Library {
 				// Sent as a string by wp_localize_script regardless of this
 				// PHP type — admin.js explicitly parses it back to a number,
 				// so don't rely on it arriving as one.
-				'batchSize' => 20,
+				'batchSize' => self::BATCH_SIZE,
 			)
 		);
 	}
@@ -129,7 +130,7 @@ class SIO_Media_Library {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
 		?>
 		<div class="wrap sio-wrap">
-			<h1>Squeeze Image Optimizer</h1>
+			<h1>Squeeze Image Optimizer <span class="sio-version">v<?php echo esc_html( SIO_VERSION ); ?></span></h1>
 
 			<h2 class="nav-tab-wrapper">
 				<a href="?page=squeeze-image-optimizer&tab=settings" class="nav-tab <?php echo 'settings' === $active_tab ? 'nav-tab-active' : ''; ?>">Settings</a>
@@ -202,6 +203,16 @@ class SIO_Media_Library {
 		$this->check_ajax();
 		$ids = isset( $_POST['ids'] ) ? array_map( 'intval', (array) $_POST['ids'] ) : array();
 		$ids = array_filter( $ids );
+
+		// Enforced here as well as client-side: a cached or buggy admin.js
+		// must never be able to send thousands of images in one request
+		// and run straight into a PHP timeout.
+		if ( count( $ids ) > self::BATCH_SIZE ) {
+			wp_send_json_error(
+				sprintf( 'Batch of %d images exceeds the limit of %d. Reload the page (to pick up the current script) and try again.', count( $ids ), self::BATCH_SIZE ),
+				400
+			);
+		}
 
 		$results = array();
 		foreach ( $ids as $id ) {
